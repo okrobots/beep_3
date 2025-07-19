@@ -1,0 +1,42 @@
+name: Build beep_3 APK
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install Buildozer
+      run: |
+        pip install buildozer
+        sudo apt-get update
+        sudo apt-get install -y zip unzip openjdk-17-jdk
+
+    - name: Generate Build Config
+      run: |
+        echo "[app]" > buildozer.spec
+        echo "title = beep_3" >> buildozer.spec
+        echo "package.name = beep3" >> buildozer.spec
+        echo "package.domain = org.example" >> buildozer.spec
+        echo "version = 1.0" >> buildozer.spec
+        echo "requirements = python3,kivy" >> buildozer.spec
+        echo "android.permissions = INTERNET" >> buildozer.spec
+
+    - name: Build APK
+      run: |
+        buildozer -v android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: beep_3-apk
+        path: 
+             bin/*apk
+             bin/*aab
